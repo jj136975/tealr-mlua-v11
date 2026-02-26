@@ -108,7 +108,7 @@ impl From<String> for NameContainer {
 }
 
 #[allow(dead_code)]
-pub(crate) fn get_method_data<A: TealMultiValue, R: TealMultiValue, S: ToString + AsRef<str>>(
+pub(crate) fn get_method_data<A: TealMultiValue, R: TealMultiValue, S: AsRef<str>>(
     name: S,
     is_meta_method: bool,
     extra_self: Option<Type>,
@@ -390,7 +390,7 @@ where
 {
     fn add_method<S, A, R, M>(&mut self, name: S, _: M)
     where
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: FromLuaMultiM + TealMultiValue,
         R: ToLuaMultiM + TealMultiValue,
         M: 'static + MaybeSend + Fn(&Lua, &T, A) -> ResultM<R>,
@@ -400,7 +400,7 @@ where
 
     fn add_method_mut<S, A, R, M>(&mut self, name: S, _: M)
     where
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: FromLuaMultiM + TealMultiValue,
         R: ToLuaMultiM + TealMultiValue,
         M: 'static + MaybeSend + FnMut(&Lua, &mut T, A) -> ResultM<R>,
@@ -409,7 +409,7 @@ where
     }
 
     #[cfg(feature = "mlua_async")]
-    fn add_async_method<S: ToString + AsRef<str>, A, R, M, MR>(&mut self, name: S, _: M)
+    fn add_async_method<S: Into<String> + AsRef<str>, A, R, M, MR>(&mut self, name: S, _: M)
     where
         T: 'static,
         M: Fn(Lua, mlua::UserDataRef<T>, A) -> MR + MaybeSend + 'static,
@@ -427,7 +427,7 @@ where
 
     fn add_function<S, A, R, F>(&mut self, name: S, _: F)
     where
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: FromLuaMultiM + TealMultiValue,
         R: ToLuaMultiM + TealMultiValue,
         F: 'static + MaybeSend + Fn(&Lua, A) -> ResultM<R>,
@@ -437,7 +437,7 @@ where
 
     fn add_function_mut<S, A, R, F>(&mut self, name: S, _: F)
     where
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: FromLuaMultiM + TealMultiValue,
         R: ToLuaMultiM + TealMultiValue,
         F: 'static + MaybeSend + FnMut(&Lua, A) -> ResultM<R>,
@@ -448,7 +448,7 @@ where
     #[cfg(feature = "mlua_async")]
     fn add_async_function<S, A, R, F, FR>(&mut self, name: S, _: F)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         A: FromLuaMultiM + TealMultiValue,
         R: ToLuaMultiM + TealMultiValue,
         F: Fn(Lua, A) -> FR + MaybeSend + 'static,
@@ -540,7 +540,7 @@ where
 
     fn add_field_method_get<S, R, M>(&mut self, name: S, _: M)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         R: mlua::IntoLua + ToTypename,
         M: 'static + MaybeSend + Fn(&Lua, &T) -> mlua::Result<R>,
     {
@@ -549,7 +549,7 @@ where
 
     fn add_field_method_set<S, A, M>(&mut self, name: S, _: M)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         A: mlua::FromLua + ToTypename,
         M: 'static + MaybeSend + FnMut(&Lua, &mut T, A) -> mlua::Result<()>,
     {
@@ -558,7 +558,7 @@ where
 
     fn add_field_function_get<S, R, F>(&mut self, name: S, _: F)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         R: mlua::IntoLua + ToTypename,
         F: 'static + MaybeSend + Fn(&Lua, mlua::AnyUserData) -> mlua::Result<R>,
     {
@@ -567,7 +567,7 @@ where
 
     fn add_field_function_set<S, A, F>(&mut self, name: S, _: F)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         A: mlua::FromLua + ToTypename,
         F: 'static + MaybeSend + FnMut(&Lua, mlua::AnyUserData, A) -> mlua::Result<()>,
     {
@@ -592,7 +592,7 @@ impl RecordGenerator {
     ///documents that this type has a field of the given type and name when exposed to lua
     pub fn add_field<S, R>(&mut self, name: S)
     where
-        S: AsRef<str> + ToString,
+        S: AsRef<str> + Into<String>,
         R: ToTypename,
     {
         self.copy_docs(name.as_ref().as_bytes());
@@ -601,7 +601,7 @@ impl RecordGenerator {
     }
     /// documents that this type has a method of the given type and name when exposed to lua
     pub fn add_method<
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: TealMultiValue,
         R: TealMultiValue,
         T: ToTypename,
@@ -618,7 +618,7 @@ impl RecordGenerator {
     }
     /// documents that this type has a method of the given type and name when exposed to lua
     pub fn add_method_mut<
-        S: ToString + AsRef<str>,
+        S: Into<String> + AsRef<str>,
         A: TealMultiValue,
         R: TealMultiValue,
         T: ToTypename,
@@ -634,7 +634,7 @@ impl RecordGenerator {
         ))
     }
     /// documents that this type has a function of the given type and name when exposed to lua
-    pub fn add_function<S: ToString + AsRef<str>, A: TealMultiValue, R: TealMultiValue>(
+    pub fn add_function<S: Into<String> + AsRef<str>, A: TealMultiValue, R: TealMultiValue>(
         &mut self,
         name: S,
     ) {
@@ -643,7 +643,7 @@ impl RecordGenerator {
             .push(get_method_data::<A, R, _>(name, false, None))
     }
     /// documents that this type has a function of the given type and name when exposed to lua
-    pub fn add_function_mut<S: ToString + AsRef<str>, A: TealMultiValue, R: TealMultiValue>(
+    pub fn add_function_mut<S: Into<String> + AsRef<str>, A: TealMultiValue, R: TealMultiValue>(
         &mut self,
         name: S,
     ) {
