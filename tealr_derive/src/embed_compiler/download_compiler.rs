@@ -1,9 +1,9 @@
+use std::io::Seek;
 use std::{
     fs::File,
     io::{Read, Write},
     path::Path,
 };
-use std::io::Seek;
 use ureq::get;
 use zip::{read::ZipFile, ZipArchive};
 
